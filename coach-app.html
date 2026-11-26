@@ -241,6 +241,14 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
   .dial-decision { border-right: none; border-bottom: 1px solid var(--rule); padding-right: 0; }
   .dial-result { padding-left: 0; }
 }
+
+.screen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+.screen-grid.two { grid-template-columns: 1fr 1fr; }
+.screen-grid.one { grid-template-columns: 1fr; }
+.screen-item { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--rule); background: var(--off); }
+.screen-item img { width: 100%; display: block; }
+.screen-label-bar { padding: 8px 14px; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); letter-spacing: 0.06em; border-top: 1px solid var(--rule); background: #fff; }
+@media (max-width: 720px) { .screen-grid, .screen-grid.two { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>

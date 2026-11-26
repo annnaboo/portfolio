@@ -241,6 +241,14 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
   .dial-decision { border-right: none; border-bottom: 1px solid var(--rule); padding-right: 0; }
   .dial-result { padding-left: 0; }
 }
+
+.screen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+.screen-grid.two { grid-template-columns: 1fr 1fr; }
+.screen-grid.one { grid-template-columns: 1fr; }
+.screen-item { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--rule); background: var(--off); }
+.screen-item img { width: 100%; display: block; }
+.screen-label-bar { padding: 8px 14px; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); letter-spacing: 0.06em; border-top: 1px solid var(--rule); background: #fff; }
+@media (max-width: 720px) { .screen-grid, .screen-grid.two { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -261,9 +269,9 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
       <p class="hero-sub">My team keeps design updates on a dedicated page as plain frames. After a change ships, outdated copies stay scattered across the file. Update Sync finds them and swaps in the exact new version — tagged with the release it shipped in.</p>
       <div class="hero-meta">
         <div class="hm-row"><span class="hm-k">Role</span><span class="hm-v">Designer &amp; builder</span></div>
-        <div class="hm-row"><span class="hm-k">Stack</span><span class="hm-v">Figma Plugin API · built with AI</span></div>
+        <div class="hm-row"><span class="hm-k">Stack</span><span class="hm-v">Figma Plugin API · plain JS · built with AI</span></div>
         <div class="hm-row"><span class="hm-k">Scope</span><span class="hm-v">Idea → Internal testing</span></div>
-        <div class="hm-row"><span class="hm-k">Interface</span><span class="hm-v">RU / EN, switch in one click</span></div>
+        <div class="hm-row"><span class="hm-k">Interface</span><span class="hm-v">RU / EN / UA, switch in one click</span></div>
       </div>
     </div>
 
@@ -289,7 +297,7 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
           <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
           <div class="pv-content">
             <div class="pv-name">Review matches</div>
-            <div class="pv-note">See where each old version lives before changing anything</div>
+            <div class="pv-note">Similarity score, “text differs” flag, before → after preview</div>
           </div>
         </div>
         <div class="pv-step active">
@@ -302,8 +310,8 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
         <div class="pv-step active">
           <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
           <div class="pv-content">
-            <div class="pv-name">Tag with the release</div>
-            <div class="pv-note">Every change is traceable to the release it shipped in</div>
+            <div class="pv-name">Tag, back up, roll back</div>
+            <div class="pv-note">Release badge on the update; old copies saved to a backups page</div>
           </div>
         </div>
       </div>
@@ -322,9 +330,9 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
       <div class="hs-s">the Updates page</div>
     </div>
     <div class="hs">
-      <div class="hs-n">2</div>
-      <div class="hs-l">languages</div>
-      <div class="hs-s">RU / EN interface</div>
+      <div class="hs-n">3</div>
+      <div class="hs-l">interface languages</div>
+      <div class="hs-s">RU · EN · UA</div>
     </div>
   </div>
 </div>
@@ -388,26 +396,27 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
     <div class="arch-tiers">
       <div class="arch-tier">
         <div class="at-n">Updates page</div>
-        <div class="at-d">The team’s existing page of shipped updates becomes the source of truth.</div>
+        <div class="at-d">Old → new frame pairs, each linked with a release label.</div>
         <span class="at-t">Source only</span>
       </div>
       <div class="arch-tier key">
-        <div class="at-n">Matching</div>
-        <div class="at-d">Finds outdated versions of each update across all pages of the file.</div>
+        <div class="at-n">Fingerprint matching</div>
+        <div class="at-d">Compares the layer tree, layer names and sizes; numbers in names are ignored, so “Card 3” matches “Card 7”.</div>
         <span class="at-t">★ Key layer</span>
       </div>
       <div class="arch-tier">
-        <div class="at-n">Release tags</div>
-        <div class="at-d">Each replacement is labelled with the release it shipped in.</div>
-        <span class="at-t">Traceability</span>
+        <div class="at-n">Backups &amp; releases</div>
+        <div class="at-d">Replaced elements move to a backups page for rollback; a Releases tab shows how much of the file is updated.</div>
+        <span class="at-t">Safe by default</span>
       </div>
     </div>
     <div class="arch-code">
       <div class="cp">
-        <div class="cp-l">update (example)</div>
+        <div class="cp-l">update link (example)</div>
         <pre>{
-  <span class="ck">"frame"</span>: <span class="cv">"Note card"</span>,
-  <span class="ck">"release"</span>: <span class="cv">"v2.14"</span>
+  <span class="ck">"old"</span>: <span class="cv">"Note card"</span>,
+  <span class="ck">"new"</span>: <span class="cv">"Note card · v2"</span>,
+  <span class="ck">"release"</span>: <span class="cv">"v2.4"</span>
 }</pre>
       </div>
       <div class="cp hl">
@@ -417,8 +426,9 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
 <span class="ck">pages</span>: <span class="cv">Flows · Specs · Handoff</span></pre>
       </div>
       <div class="cp">
-        <div class="cp-l">ui</div>
-        <pre><span class="ck">lang</span>: <span class="cv">RU | EN</span>  <span class="cc">/* one click */</span></pre>
+        <div class="cp-l">manifest.json</div>
+        <pre><span class="ck">networkAccess</span>: <span class="cv">none</span>  <span class="cc">/* nothing leaves the file */</span>
+<span class="ck">ui</span>: <span class="cv">RU | EN | UA</span></pre>
       </div>
     </div>
   </div>
@@ -441,18 +451,23 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
     </div>
     <div class="pt-row hl">
       <div class="pt-who">Plugin</div>
-      <div class="pt-action">Scans every page for outdated copies of that element</div>
+      <div class="pt-action">Scans the chosen pages and scores every similar frame; matches from 90% are pre-selected</div>
       <div class="pt-note">List of matches</div>
     </div>
     <div class="pt-row">
       <div class="pt-who">Designer</div>
-      <div class="pt-action">Reviews the matches and chooses which to replace</div>
+      <div class="pt-action">Checks flags and before → after previews, excludes false matches</div>
       <div class="pt-note">Approved changes</div>
     </div>
     <div class="pt-row">
       <div class="pt-who">Plugin</div>
-      <div class="pt-action">Replaces each copy with an exact duplicate of the update and tags the release</div>
+      <div class="pt-action">Replaces each copy with an exact duplicate, keeps position and constraints, backs up the old one</div>
       <div class="pt-note">Up-to-date file</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Designer</div>
+      <div class="pt-action">Selects any screen to see which release updated it; rolls back from history if needed</div>
+      <div class="pt-note">Traceable file</div>
     </div>
   </div>
 
@@ -502,13 +517,13 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
     <div class="dial-item">
       <div class="dial-decision">
         <div class="dial-label">Decision 04</div>
-        <div class="dial-title">Two languages from day one</div>
-        <div class="dial-body">A click-to-switch RU / EN interface.</div>
-        <span class="dial-tag">Accessibility · Team</span>
+        <div class="dial-title">Show risks before replacing</div>
+        <div class="dial-body">A “text differs” flag, a before → after preview and a history with rollback.</div>
+        <span class="dial-tag">Trust · Safety</span>
       </div>
       <div class="dial-result">
         <div class="dial-label">What happened</div>
-        <div class="dial-outcome-body">The whole team can use it in the language they think in.</div>
+        <div class="dial-outcome-body">Replacing dozens of frames stops feeling risky: every change can be checked first and undone later.</div>
       </div>
     </div>
   </div>
@@ -520,7 +535,7 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
   <p>In internal testing on real team files.</p>
   <div class="out-grid">
     <div class="og">
-      <div class="og-n">RU/EN</div>
+      <div class="og-n">RU/EN/UA</div>
       <div class="og-l">Interface</div>
       <div class="og-s">switch in one click</div>
     </div>
@@ -542,7 +557,7 @@ footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; a
     </div>
     <div class="o2">
       <div class="o2-l">What's next</div>
-      <div class="o2-t">Publishing to Figma Community once it holds up on real files, and a log of updates per release.</div>
+      <div class="o2-t">Publishing to Figma Community once it holds up on real files: English-first listing, icon, cover and clear documentation for the backups page.</div>
     </div>
   </div>
 
