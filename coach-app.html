@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoachApp — Anna Izotova</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'NHG Display';
+  src: local('SF Pro Display'), local('Helvetica Neue'), local('Arial');
+  font-weight: 100 900;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:  #7a4a20;
+  --white: #ffffff;
+  --off:   #f8f8f6;
+  --text:  #111111;
+  --t2:    #555555;
+  --t3:    #999999;
+  --rule:  #e8e8e8;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--white);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 15px; line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 56px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-back { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--t3); text-decoration: none; display: flex; align-items: center; gap: 8px; letter-spacing: 0.03em; transition: color 0.15s; }
+.nav-back:hover { color: var(--text); }
+.nav-back::before { content: '←'; }
+.nav-mid { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--t3); letter-spacing: 0.03em; }
+.nav-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--blue); border: 1px solid rgba(122,74,32,0.25); padding: 3px 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ── HERO — visual pipeline, not text ── */
+.hero { padding: 72px 56px 0; max-width: 1100px; margin: 0 auto; }
+.hero-top { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; padding-bottom: 56px; border-bottom: 1px solid var(--rule); }
+
+.hero-left {}
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 24px; }
+
+h1 {
+  font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif;
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 300; line-height: 1.05; letter-spacing: -0.025em;
+  color: var(--text); margin-bottom: 20px;
+}
+h1 em { font-style: normal; font-weight: 700; }
+h1 .blue { color: var(--blue); }
+
+.hero-sub { font-size: 14px; color: var(--t2); line-height: 1.75; max-width: 380px; margin-bottom: 32px; }
+
+.hero-meta { display: flex; flex-direction: column; gap: 0; }
+.hm-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+.hm-row:first-child { border-top: 1px solid var(--rule); }
+.hm-k { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; }
+.hm-v { font-size: 12px; color: var(--text); font-weight: 500; }
+
+/* Hero right — the pipeline diagram */
+.hero-right { display: flex; flex-direction: column; gap: 0; }
+.hero-pipe-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+.pipe-viz { display: flex; flex-direction: column; gap: 0; }
+.pv-step { display: grid; grid-template-columns: 24px 1fr; gap: 16px; align-items: stretch; }
+.pv-left { display: flex; flex-direction: column; align-items: center; }
+.pv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); flex-shrink: 0; margin-top: 5px; }
+.pv-step.active .pv-dot { background: var(--blue); }
+.pv-line { width: 1px; background: var(--rule); flex: 1; margin: 3px 0; min-height: 20px; }
+.pv-step:last-child .pv-line { display: none; }
+.pv-content { padding-bottom: 20px; }
+.pv-name { font-size: 12px; font-weight: 600; color: var(--t2); line-height: 1.3; margin-bottom: 2px; }
+.pv-step.active .pv-name { color: var(--text); }
+.pv-note { font-size: 11px; color: var(--t3); line-height: 1.4; }
+.pv-step.active .pv-note { color: var(--t2); }
+.pv-tag { display: inline-block; margin-top: 5px; font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(122,74,32,0.2); padding: 1px 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Hero stats — below the fold line */
+.hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 32px 0 0; }
+.hs { border-right: 1px solid var(--rule); padding-right: 32px; }
+.hs + .hs { padding-left: 32px; }
+.hs:last-child { border-right: none; }
+.hs-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: clamp(28px, 4vw, 48px); font-weight: 700; color: var(--blue); line-height: 1; letter-spacing: -0.04em; margin-bottom: 6px; }
+.hs-l { font-size: 12px; color: var(--t2); margin-bottom: 2px; }
+.hs-s { font-size: 11px; color: var(--t3); }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 56px; }
+section { border-bottom: 1px solid var(--rule); padding: 64px 0; }
+section:last-of-type { border-bottom: none; }
+.sec-hd { display: flex; align-items: baseline; gap: 14px; margin-bottom: 36px; }
+.sec-n { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--blue); opacity: 0.4; letter-spacing: 0.1em; }
+h2 { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+p { color: var(--t2); font-size: 14px; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+
+/* ── PROBLEM — enter with the data ── */
+/* Stark before/after as the OPENING, not buried at 07 */
+.opening-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); margin-bottom: 40px; }
+.os-col { padding: 28px; }
+.os-col.bad { background: var(--off); }
+.os-col.good { background: var(--blue); }
+.os-lbl { font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+.os-col.bad .os-lbl { color: var(--t3); }
+.os-col.good .os-lbl { color: rgba(255,255,255,0.4); }
+.os-time { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 48px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; margin-bottom: 5px; }
+.os-col.bad .os-time { color: var(--text); }
+.os-col.good .os-time { color: rgba(255,255,255,0.9); }
+.os-sub { font-size: 11px; margin-bottom: 20px; }
+.os-col.bad .os-sub { color: var(--t3); }
+.os-col.good .os-sub { color: rgba(255,255,255,0.4); }
+.os-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.os-list li { font-size: 12px; display: flex; gap: 8px; line-height: 1.4; }
+.os-col.bad .os-list li { color: var(--t3); }
+.os-col.good .os-list li { color: rgba(255,255,255,0.55); }
+.os-ic { flex-shrink: 0; font-weight: 700; }
+
+.quote-line { font-size: 16px; font-weight: 300; color: var(--text); line-height: 1.55; padding: 24px 0 24px 18px; border-left: 2px solid var(--blue); margin-bottom: 32px; max-width: 560px; }
+.ql-attr { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 10px; }
+
+.audit-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); }
+.ar { padding: 20px; border-right: 1px solid var(--rule); }
+.ar:last-child { border-right: none; }
+.ar-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 32px; font-weight: 700; color: var(--blue); letter-spacing: -0.04em; line-height: 1; margin-bottom: 6px; }
+.ar-l { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.ar-d { font-size: 11px; color: var(--t3); line-height: 1.5; }
+
+/* ── TOKEN ARCHITECTURE ── */
+.arch-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; border: 1px solid var(--rule); margin-top: 32px; }
+.arch-tiers { border-right: 1px solid var(--rule); }
+.arch-tier { padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+.arch-tier:last-child { border-bottom: none; }
+.arch-tier.key { background: var(--blue); }
+.arch-tier.key .at-n { color: rgba(255,255,255,0.9); }
+.arch-tier.key .at-d { color: rgba(255,255,255,0.5); }
+.arch-tier.key .at-t { color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.2); }
+.at-n { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.at-d { font-size: 11px; color: var(--t3); line-height: 1.5; margin-bottom: 6px; }
+.at-t { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(122,74,32,0.2); padding: 1px 6px; letter-spacing: 0.06em; display: inline-block; }
+.arch-code { display: flex; flex-direction: column; }
+.cp { background: var(--blue); filter: brightness(0.82); padding: 18px 22px; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.cp:last-child { border-bottom: none; }
+.cp.hl { background: var(--blue); filter: none; }
+.cp-l { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.cp pre { font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.8; color: #b0aed0; }
+.ck { color: #8ba8f0; } .cv { color: #f0c070; } .cc { color: #4a6a40; }
+
+/* ── DECISIONS AS DIALOGUE ── */
+.dialogue { display: flex; flex-direction: column; gap: 0; margin-top: 32px; }
+.dial-item { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); }
+.dial-item:last-child { border-bottom: 1px solid var(--rule); }
+.dial-decision { padding: 28px 28px 28px 0; border-right: 1px solid var(--rule); }
+.dial-result { padding: 28px 0 28px 28px; }
+.dial-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.dial-decision .dial-label { color: var(--blue); opacity: 0.5; }
+.dial-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.01em; line-height: 1.4; }
+.dial-body { font-size: 12px; color: var(--t2); line-height: 1.65; margin-bottom: 8px; }
+.dial-q { font-size: 11px; font-style: italic; color: var(--t3); padding-left: 12px; border-left: 2px solid rgba(122,74,32,0.2); margin-top: 10px; line-height: 1.55; }
+.dial-tag { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(122,74,32,0.2); padding: 2px 6px; letter-spacing: 0.06em; text-transform: uppercase; display: inline-block; margin-top: 8px; }
+.dial-outcome-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.dial-outcome-body { font-size: 12px; color: var(--t2); line-height: 1.65; }
+
+/* ── PIPELINE TABLE ── */
+.pipe-table { border: 1px solid var(--rule); margin-top: 32px; }
+.pt-hd { display: grid; grid-template-columns: 100px 1fr 160px; background: var(--off); border-bottom: 1px solid var(--rule); }
+.pt-hd > div { padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; border-right: 1px solid var(--rule); }
+.pt-hd > div:last-child { border-right: none; }
+.pt-row { display: grid; grid-template-columns: 100px 1fr 160px; border-bottom: 1px solid var(--rule); }
+.pt-row:last-child { border-bottom: none; }
+.pt-row.hl { background: var(--blue); }
+.pt-row > div { padding: 13px 14px; font-size: 12px; border-right: 1px solid var(--rule); line-height: 1.5; }
+.pt-row.hl > div { border-right-color: rgba(255,255,255,0.1); }
+.pt-row:not(.hl) > div:last-child { border-right: none; }
+.pt-row.hl > div:last-child { border-right: none; }
+.pt-who { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600; }
+.pt-row:not(.hl) .pt-who { color: var(--blue); opacity: 0.6; }
+.pt-row.hl .pt-who { color: rgba(255,255,255,0.5); }
+.pt-action { color: var(--text); font-weight: 400; }
+.pt-row.hl .pt-action { color: rgba(255,255,255,0.85); }
+.pt-note { color: var(--t3); font-size: 11px; }
+.pt-row.hl .pt-note { color: rgba(255,255,255,0.4); }
+
+/* ── OUTCOMES mid-page ── */
+.out-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); margin-top: 32px; margin-bottom: 28px; }
+.og { padding: 28px; border-right: 1px solid var(--rule); }
+.og:last-child { border-right: none; }
+.og-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.05em; color: var(--blue); margin-bottom: 8px; }
+.og-l { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.og-s { font-size: 11px; color: var(--t3); line-height: 1.5; }
+
+.q3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); margin-bottom: 24px; }
+.q3-item { padding: 20px; border-right: 1px solid var(--rule); }
+.q3-item:last-child { border-right: none; }
+.qt { font-size: 12px; font-style: italic; color: var(--text); line-height: 1.6; margin-bottom: 8px; font-weight: 300; }
+.qa { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); letter-spacing: 0.04em; }
+
+.out-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); }
+.o2 { padding: 22px; border-right: 1px solid var(--rule); }
+.o2:last-child { border-right: none; }
+.o2-l { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; opacity: 0.5; }
+.o2-t { font-size: 12px; color: var(--t2); line-height: 1.65; }
+
+/* ── NARRATIVE ENDING ── */
+.narrative { max-width: 640px; }
+.narr-p { font-size: 15px; color: var(--t2); line-height: 1.8; margin-bottom: 20px; }
+.narr-p:last-child { margin-bottom: 0; }
+.narr-p strong { color: var(--text); font-weight: 600; }
+.narr-highlight { font-size: 16px; color: var(--text); font-weight: 400; line-height: 1.65; padding: 20px 0 20px 18px; border-left: 2px solid var(--blue); margin: 32px 0; }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; align-items: center; justify-content: space-between; }
+.ft { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); letter-spacing: 0.04em; }
+.ft-link { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 1px; transition: border-color 0.15s; }
+.ft-link:hover { border-color: var(--text); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.hero { animation: fadeUp 0.4s ease both; }
+
+@media (max-width: 720px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 48px 20px 0; }
+  .wrap { padding: 0 20px; }
+  footer { padding: 24px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .hero-top, .opening-split, .dial-item, .arch-wrap, .out-2col { grid-template-columns: 1fr; }
+  .hero-stats, .audit-row, .out-grid, .q3 { grid-template-columns: 1fr; }
+  .hs + .hs, .og + .og { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 20px; }
+  .pt-hd, .pt-row { grid-template-columns: 80px 1fr; }
+  .pt-hd > div:last-child, .pt-row > div:last-child { display: none; }
+  .dial-decision { border-right: none; border-bottom: 1px solid var(--rule); padding-right: 0; }
+  .dial-result { padding-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="index.html">Portfolio</a>
+  <span class="nav-mid">CoachApp · Pet project</span>
+  <span class="nav-tag">Case Study</span>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-left">
+      <div class="eyebrow">Pet project · Web · iOS · Supabase</div>
+      <h1>One coach.<br><em>Every</em> client.<br><span class="blue">One place.</span></h1>
+      <p class="hero-sub">I’m also a certified personal trainer. I wanted programs, workout logs, check-ins and nutrition for all my clients in one app — so I designed and built it myself, web first and then natively for iOS.</p>
+      <div class="hero-meta">
+        <div class="hm-row"><span class="hm-k">Role</span><span class="hm-v">Designer &amp; builder</span></div>
+        <div class="hm-row"><span class="hm-k">Stack</span><span class="hm-v">Next.js · Supabase · SwiftUI · Vercel</span></div>
+        <div class="hm-row"><span class="hm-k">Scope</span><span class="hm-v">Idea → Live product</span></div>
+        <div class="hm-row"><span class="hm-k">Platforms</span><span class="hm-v">Web (PWA) · iOS</span></div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-pipe-label">How the app works</div>
+      <div class="pipe-viz">
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Coach builds workouts</div>
+            <div class="pv-note">Exercises with sets, reps, technique notes and video</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Groups them into programs</div>
+            <div class="pv-note">Ordered weeks with dates, assigned to one or many clients</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Client trains and logs</div>
+            <div class="pv-note">Weights and reps per set, “Week X of Y” progress</div>
+            <span class="pv-tag">★ Key step</span>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Client checks in</div>
+            <div class="pv-note">Measurements, mood and rest days</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Coach reviews</div>
+            <div class="pv-note">Sees every client’s data and adjusts the plan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hs">
+      <div class="hs-n">2</div>
+      <div class="hs-l">roles, one data model</div>
+      <div class="hs-s">coach · client — plus a self-coach mode</div>
+    </div>
+    <div class="hs">
+      <div class="hs-n">2</div>
+      <div class="hs-l">platforms</div>
+      <div class="hs-s">web reference build + native iOS</div>
+    </div>
+    <div class="hs">
+      <div class="hs-n">RLS</div>
+      <div class="hs-l">on every table</div>
+      <div class="hs-s">clients only ever see their own data</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-hd"><span class="sec-n">01</span><h2>The Problem</h2></div>
+  <div class="opening-split">
+    <div class="os-col bad">
+      <div class="os-lbl">Without a tool</div>
+      <div class="os-time">Scattered</div>
+      <div class="os-sub">programs, logs and feedback in different places</div>
+      <ul class="os-list">
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Programs sent as messages and files</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Progress hard to compare week to week</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>No single view of all clients</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Nutrition plans separate from training</li>
+      </ul>
+    </div>
+    <div class="os-col good">
+      <div class="os-lbl">With CoachApp</div>
+      <div class="os-time">One app</div>
+      <div class="os-sub">for the coach and every client</div>
+      <ul class="os-list">
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Programs assigned in a few taps</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Every set logged against the plan</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>All clients visible to the coach</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Training, check-ins and nutrition together</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-line">
+    “Design it like a product, build it like a product — even if the first users are my own clients.”
+    <div class="ql-attr">— Project principle</div>
+  </div>
+  <div class="audit-row">
+    <div class="ar">
+      <div class="ar-n">1 → N</div>
+      <div class="ar-l">One coach, many clients</div>
+      <div class="ar-d">The data model and permissions are built around this relationship</div>
+    </div>
+    <div class="ar">
+      <div class="ar-n">3</div>
+      <div class="ar-l">Core objects</div>
+      <div class="ar-d">Workouts → programs → schedule, with logs attached to each exercise</div>
+    </div>
+    <div class="ar">
+      <div class="ar-n">€</div>
+      <div class="ar-l">One currency everywhere</div>
+      <div class="ar-d">Payments and prices stay consistent across web and iOS</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">02</span><h2>Architecture</h2></div>
+  <p>Security lives in the database, not in the interface. Supabase row-level security decides who sees what, so every new screen is safe by default.</p>
+  <div class="arch-wrap">
+    <div class="arch-tiers">
+      <div class="arch-tier">
+        <div class="at-n">Roles</div>
+        <div class="at-d">profiles.role — coach or client. Self-coach covers people who train themselves.</div>
+        <span class="at-t">Identity</span>
+      </div>
+      <div class="arch-tier key">
+        <div class="at-n">Data</div>
+        <div class="at-d">Workouts with exercises (JSON), programs as ordered workout lists, a schedule per client.</div>
+        <span class="at-t">★ Key layer</span>
+      </div>
+      <div class="arch-tier">
+        <div class="at-n">Security</div>
+        <div class="at-d">RLS on every table: clients own their rows, the coach reads all.</div>
+        <span class="at-t">Safe by default</span>
+      </div>
+    </div>
+    <div class="arch-code">
+      <div class="cp">
+        <div class="cp-l">exercise.json</div>
+        <pre>{
+  <span class="ck">"name"</span>: <span class="cv">"Glute bridge"</span>,
+  <span class="ck">"sets"</span>: <span class="cv">"4"</span>,  <span class="ck">"reps"</span>: <span class="cv">"12-15"</span>,
+  <span class="ck">"youtube"</span>: <span class="cv">"…"</span>
+}</pre>
+      </div>
+      <div class="cp hl">
+        <div class="cp-l">rls.sql — coach access pattern</div>
+        <pre><span class="cc">-- Coach sees every client</span>
+EXISTS (SELECT 1 FROM profiles
+  WHERE id = auth.uid()
+  AND role = <span class="cv">'coach'</span>)</pre>
+      </div>
+      <div class="cp">
+        <div class="cp-l">stack</div>
+        <pre><span class="ck">web</span>: <span class="cv">Next.js · TypeScript · Vercel</span>
+<span class="ck">ios</span>: <span class="cv">SwiftUI</span>
+<span class="ck">data</span>: <span class="cv">Supabase · Postgres</span></pre>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">03</span><h2>Step by Step</h2></div>
+  <p>What happens from the moment I build a workout to the moment I see a client’s result.</p>
+  <div class="pipe-table">
+    <div class="pt-hd">
+      <div>Who</div>
+      <div>What happens</div>
+      <div>Output</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Coach</div>
+      <div class="pt-action">Creates a workout: exercises, sets, reps, technique notes, video links</div>
+      <div class="pt-note">Reusable template</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Coach</div>
+      <div class="pt-action">Combines workouts into a program with dates and assigns it to clients</div>
+      <div class="pt-note">Weekly schedule</div>
+    </div>
+    <div class="pt-row hl">
+      <div class="pt-who">Client</div>
+      <div class="pt-action">Opens today’s workout, logs weights and reps for every set</div>
+      <div class="pt-note">Progress against plan</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Client</div>
+      <div class="pt-action">Adds measurements, mood and rest days in the weekly calendar</div>
+      <div class="pt-note">Context for the coach</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Coach</div>
+      <div class="pt-action">Reviews logs and check-ins, edits nutrition and the next weeks</div>
+      <div class="pt-note">Updated plan</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">04</span><h2>Decisions &amp; Consequences</h2></div>
+  <p>A pet project still needs product decisions. These shaped it the most.</p>
+
+  <div class="dialogue">
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 01</div>
+        <div class="dial-title">Web first, as the reference</div>
+        <div class="dial-body">The web app is the “etalon”: every iOS screen is checked against it for parity.</div>
+        <span class="dial-tag">Process · Parity</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">One source of truth for features and flows — iOS work became translation, not reinvention.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 02</div>
+        <div class="dial-title">Go beyond parity where it matters</div>
+        <div class="dial-body">On iOS the coach can edit nutrition (macros); on the web it stays read-only.</div>
+        <span class="dial-tag">Mobile-first coaching</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">The coach can adjust a client’s nutrition right after a session, from the phone.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 03</div>
+        <div class="dial-title">Permissions in the database</div>
+        <div class="dial-body">Access rules are row-level security policies, not checks in the UI.</div>
+        <span class="dial-tag">Security</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">New screens can’t leak another client’s data by accident — the database refuses the query.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 04</div>
+        <div class="dial-title">Log the latest state, not every set</div>
+        <div class="dial-body">Workout logs keep one row per client and exercise. Simple and fast, but no full history yet.</div>
+        <span class="dial-tag">Tradeoff · Known debt</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">Documented as debt in the project context, with full set history planned next.</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">05</span><h2>Status</h2></div>
+  <p>Live on the web with real clients; the iOS app is being prepared for the App Store.</p>
+  <div class="out-grid">
+    <div class="og">
+      <div class="og-n">Live</div>
+      <div class="og-l">Web app</div>
+      <div class="og-s">deployed on Vercel, installable as a PWA</div>
+    </div>
+    <div class="og">
+      <div class="og-n">iOS</div>
+      <div class="og-l">Native app</div>
+      <div class="og-s">SwiftUI, mirroring the web reference</div>
+    </div>
+    <div class="og">
+      <div class="og-n">5</div>
+      <div class="og-l">Test accounts</div>
+      <div class="og-s">2 clients · 2 coaches · 1 self-coach</div>
+    </div>
+  </div>
+  <div class="out-2col">
+    <div class="o2">
+      <div class="o2-l">What made this work</div>
+      <div class="o2-t">Working in short sessions with an AI coding partner, a written roadmap and a living project-context file. Each session had one goal, one SQL step and one code task.</div>
+    </div>
+    <div class="o2">
+      <div class="o2-l">What's next</div>
+      <div class="o2-t">App Store release, full set-by-set history, and cleaning up duplicated assignment fields in the data model.</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">06</span><h2>What I learned</h2></div>
+  <div class="narrative">
+    <p class="narr-p">Building the product I design changed how I design. A field in a mockup is a column, a policy and an edge case in the database.</p>
+
+    <p class="narr-p"><strong>Being both the coach and the designer removed every guess.</strong> I knew which screens I open ten times a day and which ones I never touch.</p>
+
+    <div class="narr-highlight">
+      The best test user for a coaching app is a coach who trains real clients with it every week.
+    </div>
+
+    <p class="narr-p">The biggest lesson was writing things down: a project-context file and a session roadmap made it possible to pick the work up after weeks away.</p>
+
+  </div>
+
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span class="ft">Anna Izotova · Product Designer · 2026</span>
+  <a class="ft-link" href="index.html">← Back to portfolio</a>
+</footer>
+
+</body>
+</html>

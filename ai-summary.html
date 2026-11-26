@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Summary — Anna Izotova</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'NHG Display';
+  src: local('SF Pro Display'), local('Helvetica Neue'), local('Arial');
+  font-weight: 100 900;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:  #00144a;
+  --white: #ffffff;
+  --off:   #f8f8f6;
+  --text:  #111111;
+  --t2:    #555555;
+  --t3:    #999999;
+  --rule:  #e8e8e8;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--white);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 15px; line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 56px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-back { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--t3); text-decoration: none; display: flex; align-items: center; gap: 8px; letter-spacing: 0.03em; transition: color 0.15s; }
+.nav-back:hover { color: var(--text); }
+.nav-back::before { content: '←'; }
+.nav-mid { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--t3); letter-spacing: 0.03em; }
+.nav-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--blue); border: 1px solid rgba(0,20,74,0.25); padding: 3px 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ── HERO — visual pipeline, not text ── */
+.hero { padding: 72px 56px 0; max-width: 1100px; margin: 0 auto; }
+.hero-top { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; padding-bottom: 56px; border-bottom: 1px solid var(--rule); }
+
+.hero-left {}
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 24px; }
+
+h1 {
+  font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif;
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 300; line-height: 1.05; letter-spacing: -0.025em;
+  color: var(--text); margin-bottom: 20px;
+}
+h1 em { font-style: normal; font-weight: 700; }
+h1 .blue { color: var(--blue); }
+
+.hero-sub { font-size: 14px; color: var(--t2); line-height: 1.75; max-width: 380px; margin-bottom: 32px; }
+
+.hero-meta { display: flex; flex-direction: column; gap: 0; }
+.hm-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+.hm-row:first-child { border-top: 1px solid var(--rule); }
+.hm-k { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; }
+.hm-v { font-size: 12px; color: var(--text); font-weight: 500; }
+
+/* Hero right — the pipeline diagram */
+.hero-right { display: flex; flex-direction: column; gap: 0; }
+.hero-pipe-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+.pipe-viz { display: flex; flex-direction: column; gap: 0; }
+.pv-step { display: grid; grid-template-columns: 24px 1fr; gap: 16px; align-items: stretch; }
+.pv-left { display: flex; flex-direction: column; align-items: center; }
+.pv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); flex-shrink: 0; margin-top: 5px; }
+.pv-step.active .pv-dot { background: var(--blue); }
+.pv-line { width: 1px; background: var(--rule); flex: 1; margin: 3px 0; min-height: 20px; }
+.pv-step:last-child .pv-line { display: none; }
+.pv-content { padding-bottom: 20px; }
+.pv-name { font-size: 12px; font-weight: 600; color: var(--t2); line-height: 1.3; margin-bottom: 2px; }
+.pv-step.active .pv-name { color: var(--text); }
+.pv-note { font-size: 11px; color: var(--t3); line-height: 1.4; }
+.pv-step.active .pv-note { color: var(--t2); }
+.pv-tag { display: inline-block; margin-top: 5px; font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(0,20,74,0.2); padding: 1px 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Hero stats — below the fold line */
+.hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 32px 0 0; }
+.hs { border-right: 1px solid var(--rule); padding-right: 32px; }
+.hs + .hs { padding-left: 32px; }
+.hs:last-child { border-right: none; }
+.hs-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: clamp(28px, 4vw, 48px); font-weight: 700; color: var(--blue); line-height: 1; letter-spacing: -0.04em; margin-bottom: 6px; }
+.hs-l { font-size: 12px; color: var(--t2); margin-bottom: 2px; }
+.hs-s { font-size: 11px; color: var(--t3); }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 56px; }
+section { border-bottom: 1px solid var(--rule); padding: 64px 0; }
+section:last-of-type { border-bottom: none; }
+.sec-hd { display: flex; align-items: baseline; gap: 14px; margin-bottom: 36px; }
+.sec-n { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--blue); opacity: 0.4; letter-spacing: 0.1em; }
+h2 { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+p { color: var(--t2); font-size: 14px; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+
+/* ── PROBLEM — enter with the data ── */
+/* Stark before/after as the OPENING, not buried at 07 */
+.opening-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); margin-bottom: 40px; }
+.os-col { padding: 28px; }
+.os-col.bad { background: var(--off); }
+.os-col.good { background: var(--blue); }
+.os-lbl { font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+.os-col.bad .os-lbl { color: var(--t3); }
+.os-col.good .os-lbl { color: rgba(255,255,255,0.4); }
+.os-time { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 48px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; margin-bottom: 5px; }
+.os-col.bad .os-time { color: var(--text); }
+.os-col.good .os-time { color: rgba(255,255,255,0.9); }
+.os-sub { font-size: 11px; margin-bottom: 20px; }
+.os-col.bad .os-sub { color: var(--t3); }
+.os-col.good .os-sub { color: rgba(255,255,255,0.4); }
+.os-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.os-list li { font-size: 12px; display: flex; gap: 8px; line-height: 1.4; }
+.os-col.bad .os-list li { color: var(--t3); }
+.os-col.good .os-list li { color: rgba(255,255,255,0.55); }
+.os-ic { flex-shrink: 0; font-weight: 700; }
+
+.quote-line { font-size: 16px; font-weight: 300; color: var(--text); line-height: 1.55; padding: 24px 0 24px 18px; border-left: 2px solid var(--blue); margin-bottom: 32px; max-width: 560px; }
+.ql-attr { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 10px; }
+
+.audit-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); }
+.ar { padding: 20px; border-right: 1px solid var(--rule); }
+.ar:last-child { border-right: none; }
+.ar-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 32px; font-weight: 700; color: var(--blue); letter-spacing: -0.04em; line-height: 1; margin-bottom: 6px; }
+.ar-l { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.ar-d { font-size: 11px; color: var(--t3); line-height: 1.5; }
+
+/* ── TOKEN ARCHITECTURE ── */
+.arch-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; border: 1px solid var(--rule); margin-top: 32px; }
+.arch-tiers { border-right: 1px solid var(--rule); }
+.arch-tier { padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+.arch-tier:last-child { border-bottom: none; }
+.arch-tier.key { background: var(--blue); }
+.arch-tier.key .at-n { color: rgba(255,255,255,0.9); }
+.arch-tier.key .at-d { color: rgba(255,255,255,0.5); }
+.arch-tier.key .at-t { color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.2); }
+.at-n { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.at-d { font-size: 11px; color: var(--t3); line-height: 1.5; margin-bottom: 6px; }
+.at-t { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(0,20,74,0.2); padding: 1px 6px; letter-spacing: 0.06em; display: inline-block; }
+.arch-code { display: flex; flex-direction: column; }
+.cp { background: var(--blue); filter: brightness(0.82); padding: 18px 22px; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.cp:last-child { border-bottom: none; }
+.cp.hl { background: var(--blue); filter: none; }
+.cp-l { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.cp pre { font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.8; color: #b0aed0; }
+.ck { color: #8ba8f0; } .cv { color: #f0c070; } .cc { color: #4a6a40; }
+
+/* ── DECISIONS AS DIALOGUE ── */
+.dialogue { display: flex; flex-direction: column; gap: 0; margin-top: 32px; }
+.dial-item { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); }
+.dial-item:last-child { border-bottom: 1px solid var(--rule); }
+.dial-decision { padding: 28px 28px 28px 0; border-right: 1px solid var(--rule); }
+.dial-result { padding: 28px 0 28px 28px; }
+.dial-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.dial-decision .dial-label { color: var(--blue); opacity: 0.5; }
+.dial-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.01em; line-height: 1.4; }
+.dial-body { font-size: 12px; color: var(--t2); line-height: 1.65; margin-bottom: 8px; }
+.dial-q { font-size: 11px; font-style: italic; color: var(--t3); padding-left: 12px; border-left: 2px solid rgba(0,20,74,0.2); margin-top: 10px; line-height: 1.55; }
+.dial-tag { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(0,20,74,0.2); padding: 2px 6px; letter-spacing: 0.06em; text-transform: uppercase; display: inline-block; margin-top: 8px; }
+.dial-outcome-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.dial-outcome-body { font-size: 12px; color: var(--t2); line-height: 1.65; }
+
+/* ── PIPELINE TABLE ── */
+.pipe-table { border: 1px solid var(--rule); margin-top: 32px; }
+.pt-hd { display: grid; grid-template-columns: 100px 1fr 160px; background: var(--off); border-bottom: 1px solid var(--rule); }
+.pt-hd > div { padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; border-right: 1px solid var(--rule); }
+.pt-hd > div:last-child { border-right: none; }
+.pt-row { display: grid; grid-template-columns: 100px 1fr 160px; border-bottom: 1px solid var(--rule); }
+.pt-row:last-child { border-bottom: none; }
+.pt-row.hl { background: var(--blue); }
+.pt-row > div { padding: 13px 14px; font-size: 12px; border-right: 1px solid var(--rule); line-height: 1.5; }
+.pt-row.hl > div { border-right-color: rgba(255,255,255,0.1); }
+.pt-row:not(.hl) > div:last-child { border-right: none; }
+.pt-row.hl > div:last-child { border-right: none; }
+.pt-who { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600; }
+.pt-row:not(.hl) .pt-who { color: var(--blue); opacity: 0.6; }
+.pt-row.hl .pt-who { color: rgba(255,255,255,0.5); }
+.pt-action { color: var(--text); font-weight: 400; }
+.pt-row.hl .pt-action { color: rgba(255,255,255,0.85); }
+.pt-note { color: var(--t3); font-size: 11px; }
+.pt-row.hl .pt-note { color: rgba(255,255,255,0.4); }
+
+/* ── OUTCOMES mid-page ── */
+.out-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); margin-top: 32px; margin-bottom: 28px; }
+.og { padding: 28px; border-right: 1px solid var(--rule); }
+.og:last-child { border-right: none; }
+.og-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.05em; color: var(--blue); margin-bottom: 8px; }
+.og-l { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.og-s { font-size: 11px; color: var(--t3); line-height: 1.5; }
+
+.q3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); margin-bottom: 24px; }
+.q3-item { padding: 20px; border-right: 1px solid var(--rule); }
+.q3-item:last-child { border-right: none; }
+.qt { font-size: 12px; font-style: italic; color: var(--text); line-height: 1.6; margin-bottom: 8px; font-weight: 300; }
+.qa { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); letter-spacing: 0.04em; }
+
+.out-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); }
+.o2 { padding: 22px; border-right: 1px solid var(--rule); }
+.o2:last-child { border-right: none; }
+.o2-l { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; opacity: 0.5; }
+.o2-t { font-size: 12px; color: var(--t2); line-height: 1.65; }
+
+/* ── NARRATIVE ENDING ── */
+.narrative { max-width: 640px; }
+.narr-p { font-size: 15px; color: var(--t2); line-height: 1.8; margin-bottom: 20px; }
+.narr-p:last-child { margin-bottom: 0; }
+.narr-p strong { color: var(--text); font-weight: 600; }
+.narr-highlight { font-size: 16px; color: var(--text); font-weight: 400; line-height: 1.65; padding: 20px 0 20px 18px; border-left: 2px solid var(--blue); margin: 32px 0; }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; align-items: center; justify-content: space-between; }
+.ft { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); letter-spacing: 0.04em; }
+.ft-link { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 1px; transition: border-color 0.15s; }
+.ft-link:hover { border-color: var(--text); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.hero { animation: fadeUp 0.4s ease both; }
+
+@media (max-width: 720px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 48px 20px 0; }
+  .wrap { padding: 0 20px; }
+  footer { padding: 24px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .hero-top, .opening-split, .dial-item, .arch-wrap, .out-2col { grid-template-columns: 1fr; }
+  .hero-stats, .audit-row, .out-grid, .q3 { grid-template-columns: 1fr; }
+  .hs + .hs, .og + .og { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 20px; }
+  .pt-hd, .pt-row { grid-template-columns: 80px 1fr; }
+  .pt-hd > div:last-child, .pt-row > div:last-child { display: none; }
+  .dial-decision { border-right: none; border-bottom: 1px solid var(--rule); padding-right: 0; }
+  .dial-result { padding-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="index.html">Portfolio</a>
+  <span class="nav-mid">AI Summary · iOS + Web</span>
+  <span class="nav-tag">Case Study</span>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-left">
+      <div class="eyebrow">AI · iOS · Web · Motion · NDA</div>
+      <h1>Voice in.<br><em>Clarity</em><br><span class="blue">out.</span></h1>
+      <p class="hero-sub">AI Summary turns meetings, client calls and doctor visits into transcripts, summaries and action points. I lead its redesign — a new visual system, a motion-led onboarding and the first web app.</p>
+      <div class="hero-meta">
+        <div class="hm-row"><span class="hm-k">Role</span><span class="hm-v">Lead Product Designer</span></div>
+        <div class="hm-row"><span class="hm-k">Audience</span><span class="hm-v">Business professionals 45+ · US</span></div>
+        <div class="hm-row"><span class="hm-k">Scope</span><span class="hm-v">Analytics → System → Onboarding → Web</span></div>
+        <div class="hm-row"><span class="hm-k">Platforms</span><span class="hm-v">iOS · Apple Watch · Widgets · Web</span></div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-pipe-label">How the product works</div>
+      <div class="pipe-viz">
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Record a conversation</div>
+            <div class="pv-note">Meeting, call or visit — live transcript as people talk</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Transcribe</div>
+            <div class="pv-note">Speakers and timestamps, ready to scan</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Summarize with templates</div>
+            <div class="pv-note">Meeting Follow-Up, Action Points, Email Follow-Up, To-Do…</div>
+            <span class="pv-tag">★ Key step</span>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Share</div>
+            <div class="pv-note">Choose audio, transcript or summary · PDF or TXT</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Continue on the web</div>
+            <div class="pv-note">Same notes on desktop after sign-in</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hs">
+      <div class="hs-n">4</div>
+      <div class="hs-l">onboarding scenarios</div>
+      <div class="hs-s">meetings · client calls · doctor visits · conversations</div>
+    </div>
+    <div class="hs">
+      <div class="hs-n">8</div>
+      <div class="hs-l">animations approved</div>
+      <div class="hs-s">one motion language for every scenario</div>
+    </div>
+    <div class="hs">
+      <div class="hs-n">13</div>
+      <div class="hs-l">hallway test participants</div>
+      <div class="hs-s">co-facilitated with a colleague</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-hd"><span class="sec-n">01</span><h2>The Problem</h2></div>
+  <div class="opening-split">
+    <div class="os-col bad">
+      <div class="os-lbl">Before</div>
+      <div class="os-time">Hidden</div>
+      <div class="os-sub">the most valuable features were hard to find</div>
+      <ul class="os-list">
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>AI templates behind an unlabelled grid icon</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Grey secondary text below 4.5:1 contrast</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>No Dynamic Type for a 45+ audience</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Empty first run with no guidance</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Many icon-only controls</li>
+      </ul>
+    </div>
+    <div class="os-col good">
+      <div class="os-lbl">Redesign direction</div>
+      <div class="os-time">Visible</div>
+      <div class="os-sub">show the value before asking for it</div>
+      <ul class="os-list">
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Templates surfaced as a labelled AI-actions row</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Contrast-checked token palette</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Onboarding that plays the real flow: record → summary → share</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>First-run tooltips inside the welcome note</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>A web app for desktop work</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-line">
+    “Analytics from the old design are hypotheses, not facts. Every insight gets re-validated on the new UI.”
+    <div class="ql-attr">— Working rule for this redesign</div>
+  </div>
+  <div class="audit-row">
+    <div class="ar">
+      <div class="ar-n">4</div>
+      <div class="ar-l">Core flows</div>
+      <div class="ar-d">Record audio · QuickNote · Transcription · Share — measured by finished events in Amplitude</div>
+    </div>
+    <div class="ar">
+      <div class="ar-n">45+</div>
+      <div class="ar-l">Refined audience</div>
+      <div class="ar-d">Business users who need readable text, clear labels and zero guesswork</div>
+    </div>
+    <div class="ar">
+      <div class="ar-n">#1</div>
+      <div class="ar-l">Traffic channel: Google</div>
+      <div class="ar-d">Search users showed the clearest intent and the best conversion across flows</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">02</span><h2>Visual System</h2></div>
+  <p>Before redesigning screens I set up the system they are built from. One palette, one type scale and one material shared by the iOS app and the web app — so a note looks the same on the phone and on the desktop.</p>
+  <div class="arch-wrap">
+    <div class="arch-tiers">
+      <div class="arch-tier">
+        <div class="at-n">Typography</div>
+        <div class="at-d">Geologica for content, SF Pro only for native iOS strings.</div>
+        <span class="at-t">Readable at 45+</span>
+      </div>
+      <div class="arch-tier key">
+        <div class="at-n">Colour tokens</div>
+        <div class="at-d">Semantic roles — brand, text, surface, border — mapped from one palette.</div>
+        <span class="at-t">★ Key layer</span>
+      </div>
+      <div class="arch-tier">
+        <div class="at-n">Material</div>
+        <div class="at-d">Liquid glass for floating layers: tab bar, sheets.</div>
+        <span class="at-t">iOS 26 native</span>
+      </div>
+    </div>
+    <div class="arch-code">
+      <div class="cp">
+        <div class="cp-l">type.scale</div>
+        <pre><span class="cc">/* Geologica */</span>
+<span class="ck">H3</span>: <span class="cv">SemiBold 24</span>;
+<span class="ck">Body01</span>: <span class="cv">18</span>;  <span class="ck">Body04</span>: <span class="cv">15</span>;
+<span class="ck">Caption</span>: <span class="cv">14</span>;  <span class="ck">Footnote</span>: <span class="cv">13</span>;</pre>
+      </div>
+      <div class="cp hl">
+        <div class="cp-l">color.tokens — shared by iOS and web</div>
+        <pre><span class="cc">/* Meaning, not appearance */</span>
+<span class="ck">--brand-primary</span>: <span class="cv">#00144a</span>;
+<span class="ck">--brand-secondary</span>: <span class="cv">#5078c3</span>;
+<span class="ck">--brand-subtle</span>: <span class="cv">#eff5fe</span>;
+<span class="ck">--surface</span>: <span class="cv">#f3f6fa</span>;</pre>
+      </div>
+      <div class="cp">
+        <div class="cp-l">text.tokens</div>
+        <pre><span class="ck">--text-secondary</span>: <span class="cv">#343c48</span>;
+<span class="ck">--text-tertiary</span>: <span class="cv">#646e7c</span>;
+<span class="ck">--border-default</span>: <span class="cv">#cce0ff</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">03</span><h2>Onboarding, Screen by Screen</h2></div>
+  <p>The onboarding is an interactive demo of the real app, not a feature tour. Only the stage animates — text and buttons stay still, and each screen loops until the user taps Continue.</p>
+  <div class="pipe-table">
+    <div class="pt-hd">
+      <div>Screen</div>
+      <div>What happens</div>
+      <div>Motion</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Welcome</div>
+      <div class="pt-action">The orb ripples outward into two rings and two waves; scenario chips float around it</div>
+      <div class="pt-note">Sets the visual rhyme</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Pick moment</div>
+      <div class="pt-action">User chooses where they need notes — the chosen option lights up its chip on the stage</div>
+      <div class="pt-note">4 entry points</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Record</div>
+      <div class="pt-action">Recording starts and the live transcript appears line by line</div>
+      <div class="pt-note">Voice turns into text</div>
+    </div>
+    <div class="pt-row hl">
+      <div class="pt-who">Summary</div>
+      <div class="pt-action">The full summary scrolls down to Action items → Generate</div>
+      <div class="pt-note">The “aha” moment</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Share</div>
+      <div class="pt-action">Recipients pop in one by one; the send button pulses with a ring loop</div>
+      <div class="pt-note">Value of sharing</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Privacy</div>
+      <div class="pt-action">A frosted veil covers the note, the lock shackle clicks shut, three promise chips appear</div>
+      <div class="pt-note">Rhymes with Welcome</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">04</span><h2>Decisions &amp; Consequences</h2></div>
+  <p>Each decision came with a tradeoff. Here is what I chose and what it led to.</p>
+
+  <div class="dialogue">
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 01</div>
+        <div class="dial-title">Show the real app, not a quiz</div>
+        <div class="dial-body">An early version branched into a quiz. It drifted from the main idea, so I rebuilt the flow on the interactive demo: record → transcribe → summary → share.</div>
+        <span class="dial-tag">Honesty · Activation</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">The onboarding now previews exactly what users get after the paywall — no promises the product can’t keep.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 02</div>
+        <div class="dial-title">One scenario first, then swap</div>
+        <div class="dial-body">Instead of designing four onboardings in parallel, I finished the Team-meeting flow end to end and agreed it with the team.</div>
+        <span class="dial-tag">Process · Efficiency</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">All 8 Team-meeting animations were approved and written up as a motion spec. Other scenarios reuse it and only swap texts and colours.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 03</div>
+        <div class="dial-title">Animate the stage, freeze the UI</div>
+        <div class="dial-body">Text and buttons stay static; only the scene moves. Screens advance on tap, so every animation loops while it waits.</div>
+        <span class="dial-tag">Readability · 45+</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">Users read at their own pace — nothing moves under the text they are reading.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 04</div>
+        <div class="dial-title">Copy that matches the product</div>
+        <div class="dial-body">No sync or cloud promises in account copy, no reminders in the flow, and “AI Summary” as the only product name.</div>
+        <span class="dial-tag">Trust · Content</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">Sign-in, onboarding and paywall tell one consistent story that the product actually delivers.</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">05</span><h2>Status</h2></div>
+  <p>An ongoing redesign. The numbers below are about the work itself, not company metrics — those stay under NDA.</p>
+  <div class="out-grid">
+    <div class="og">
+      <div class="og-n">8/8</div>
+      <div class="og-l">Animations approved</div>
+      <div class="og-s">Team-meeting onboarding, documented as a motion spec</div>
+    </div>
+    <div class="og">
+      <div class="og-n">2</div>
+      <div class="og-l">Platforms, one system</div>
+      <div class="og-s">iOS app and web app share tokens and icons</div>
+    </div>
+    <div class="og">
+      <div class="og-n">13</div>
+      <div class="og-l">Test participants</div>
+      <div class="og-s">hallway usability sessions, colour-coded notes in FigJam</div>
+    </div>
+  </div>
+  <div class="out-2col">
+    <div class="o2">
+      <div class="o2-l">What made this work</div>
+      <div class="o2-t">Working from evidence: Amplitude funnels and cohorts set the questions, hallway tests answered them, and competitor apps served as a quality bar for every new screen.</div>
+    </div>
+    <div class="o2">
+      <div class="o2-l">What's next</div>
+      <div class="o2-t">The first web app release (notes, folders, summary + transcript, sign-in) with a Storybook for its components, onboarding for Apple Watch and widgets, and first-run tooltips aimed at retention.</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">06</span><h2>What I learned</h2></div>
+  <div class="narrative">
+    <p class="narr-p">The hardest part of an AI product is not the AI. It is making the value visible in the first minute — before the user has recorded anything of their own.</p>
+
+    <p class="narr-p">An onboarding that plays the real flow does that better than any feature list. <strong>Show the summary, not the promise of a summary.</strong></p>
+
+    <div class="narr-highlight">
+      Motion is not decoration here. It is how a 45+ user understands what just happened: voice became text, text became a summary, the summary went to the right people.
+    </div>
+
+    <p class="narr-p">Building one scenario to the end before multiplying it saved weeks of rework. It also gave the team one clear thing to approve instead of four half-finished ones.</p>
+
+  </div>
+
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span class="ft">Anna Izotova · Product Designer · 2026</span>
+  <a class="ft-link" href="index.html">← Back to portfolio</a>
+</footer>
+
+</body>
+</html>

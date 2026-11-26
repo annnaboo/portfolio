@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Update Sync — Anna Izotova</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'NHG Display';
+  src: local('SF Pro Display'), local('Helvetica Neue'), local('Arial');
+  font-weight: 100 900;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:  #3d2f8f;
+  --white: #ffffff;
+  --off:   #f8f8f6;
+  --text:  #111111;
+  --t2:    #555555;
+  --t3:    #999999;
+  --rule:  #e8e8e8;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--white);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 15px; line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 56px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-back { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--t3); text-decoration: none; display: flex; align-items: center; gap: 8px; letter-spacing: 0.03em; transition: color 0.15s; }
+.nav-back:hover { color: var(--text); }
+.nav-back::before { content: '←'; }
+.nav-mid { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--t3); letter-spacing: 0.03em; }
+.nav-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--blue); border: 1px solid rgba(61,47,143,0.25); padding: 3px 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ── HERO — visual pipeline, not text ── */
+.hero { padding: 72px 56px 0; max-width: 1100px; margin: 0 auto; }
+.hero-top { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; padding-bottom: 56px; border-bottom: 1px solid var(--rule); }
+
+.hero-left {}
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 24px; }
+
+h1 {
+  font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif;
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 300; line-height: 1.05; letter-spacing: -0.025em;
+  color: var(--text); margin-bottom: 20px;
+}
+h1 em { font-style: normal; font-weight: 700; }
+h1 .blue { color: var(--blue); }
+
+.hero-sub { font-size: 14px; color: var(--t2); line-height: 1.75; max-width: 380px; margin-bottom: 32px; }
+
+.hero-meta { display: flex; flex-direction: column; gap: 0; }
+.hm-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+.hm-row:first-child { border-top: 1px solid var(--rule); }
+.hm-k { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; }
+.hm-v { font-size: 12px; color: var(--text); font-weight: 500; }
+
+/* Hero right — the pipeline diagram */
+.hero-right { display: flex; flex-direction: column; gap: 0; }
+.hero-pipe-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+.pipe-viz { display: flex; flex-direction: column; gap: 0; }
+.pv-step { display: grid; grid-template-columns: 24px 1fr; gap: 16px; align-items: stretch; }
+.pv-left { display: flex; flex-direction: column; align-items: center; }
+.pv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); flex-shrink: 0; margin-top: 5px; }
+.pv-step.active .pv-dot { background: var(--blue); }
+.pv-line { width: 1px; background: var(--rule); flex: 1; margin: 3px 0; min-height: 20px; }
+.pv-step:last-child .pv-line { display: none; }
+.pv-content { padding-bottom: 20px; }
+.pv-name { font-size: 12px; font-weight: 600; color: var(--t2); line-height: 1.3; margin-bottom: 2px; }
+.pv-step.active .pv-name { color: var(--text); }
+.pv-note { font-size: 11px; color: var(--t3); line-height: 1.4; }
+.pv-step.active .pv-note { color: var(--t2); }
+.pv-tag { display: inline-block; margin-top: 5px; font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(61,47,143,0.2); padding: 1px 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Hero stats — below the fold line */
+.hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 32px 0 0; }
+.hs { border-right: 1px solid var(--rule); padding-right: 32px; }
+.hs + .hs { padding-left: 32px; }
+.hs:last-child { border-right: none; }
+.hs-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: clamp(28px, 4vw, 48px); font-weight: 700; color: var(--blue); line-height: 1; letter-spacing: -0.04em; margin-bottom: 6px; }
+.hs-l { font-size: 12px; color: var(--t2); margin-bottom: 2px; }
+.hs-s { font-size: 11px; color: var(--t3); }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 56px; }
+section { border-bottom: 1px solid var(--rule); padding: 64px 0; }
+section:last-of-type { border-bottom: none; }
+.sec-hd { display: flex; align-items: baseline; gap: 14px; margin-bottom: 36px; }
+.sec-n { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--blue); opacity: 0.4; letter-spacing: 0.1em; }
+h2 { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+p { color: var(--t2); font-size: 14px; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+
+/* ── PROBLEM — enter with the data ── */
+/* Stark before/after as the OPENING, not buried at 07 */
+.opening-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); margin-bottom: 40px; }
+.os-col { padding: 28px; }
+.os-col.bad { background: var(--off); }
+.os-col.good { background: var(--blue); }
+.os-lbl { font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+.os-col.bad .os-lbl { color: var(--t3); }
+.os-col.good .os-lbl { color: rgba(255,255,255,0.4); }
+.os-time { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 48px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; margin-bottom: 5px; }
+.os-col.bad .os-time { color: var(--text); }
+.os-col.good .os-time { color: rgba(255,255,255,0.9); }
+.os-sub { font-size: 11px; margin-bottom: 20px; }
+.os-col.bad .os-sub { color: var(--t3); }
+.os-col.good .os-sub { color: rgba(255,255,255,0.4); }
+.os-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.os-list li { font-size: 12px; display: flex; gap: 8px; line-height: 1.4; }
+.os-col.bad .os-list li { color: var(--t3); }
+.os-col.good .os-list li { color: rgba(255,255,255,0.55); }
+.os-ic { flex-shrink: 0; font-weight: 700; }
+
+.quote-line { font-size: 16px; font-weight: 300; color: var(--text); line-height: 1.55; padding: 24px 0 24px 18px; border-left: 2px solid var(--blue); margin-bottom: 32px; max-width: 560px; }
+.ql-attr { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 10px; }
+
+.audit-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); }
+.ar { padding: 20px; border-right: 1px solid var(--rule); }
+.ar:last-child { border-right: none; }
+.ar-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 32px; font-weight: 700; color: var(--blue); letter-spacing: -0.04em; line-height: 1; margin-bottom: 6px; }
+.ar-l { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.ar-d { font-size: 11px; color: var(--t3); line-height: 1.5; }
+
+/* ── TOKEN ARCHITECTURE ── */
+.arch-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; border: 1px solid var(--rule); margin-top: 32px; }
+.arch-tiers { border-right: 1px solid var(--rule); }
+.arch-tier { padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+.arch-tier:last-child { border-bottom: none; }
+.arch-tier.key { background: var(--blue); }
+.arch-tier.key .at-n { color: rgba(255,255,255,0.9); }
+.arch-tier.key .at-d { color: rgba(255,255,255,0.5); }
+.arch-tier.key .at-t { color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.2); }
+.at-n { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.at-d { font-size: 11px; color: var(--t3); line-height: 1.5; margin-bottom: 6px; }
+.at-t { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(61,47,143,0.2); padding: 1px 6px; letter-spacing: 0.06em; display: inline-block; }
+.arch-code { display: flex; flex-direction: column; }
+.cp { background: var(--blue); filter: brightness(0.82); padding: 18px 22px; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.cp:last-child { border-bottom: none; }
+.cp.hl { background: var(--blue); filter: none; }
+.cp-l { font-family: 'DM Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.cp pre { font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.8; color: #b0aed0; }
+.ck { color: #8ba8f0; } .cv { color: #f0c070; } .cc { color: #4a6a40; }
+
+/* ── DECISIONS AS DIALOGUE ── */
+.dialogue { display: flex; flex-direction: column; gap: 0; margin-top: 32px; }
+.dial-item { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); }
+.dial-item:last-child { border-bottom: 1px solid var(--rule); }
+.dial-decision { padding: 28px 28px 28px 0; border-right: 1px solid var(--rule); }
+.dial-result { padding: 28px 0 28px 28px; }
+.dial-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.dial-decision .dial-label { color: var(--blue); opacity: 0.5; }
+.dial-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.01em; line-height: 1.4; }
+.dial-body { font-size: 12px; color: var(--t2); line-height: 1.65; margin-bottom: 8px; }
+.dial-q { font-size: 11px; font-style: italic; color: var(--t3); padding-left: 12px; border-left: 2px solid rgba(61,47,143,0.2); margin-top: 10px; line-height: 1.55; }
+.dial-tag { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--blue); border: 1px solid rgba(61,47,143,0.2); padding: 2px 6px; letter-spacing: 0.06em; text-transform: uppercase; display: inline-block; margin-top: 8px; }
+.dial-outcome-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.dial-outcome-body { font-size: 12px; color: var(--t2); line-height: 1.65; }
+
+/* ── PIPELINE TABLE ── */
+.pipe-table { border: 1px solid var(--rule); margin-top: 32px; }
+.pt-hd { display: grid; grid-template-columns: 100px 1fr 160px; background: var(--off); border-bottom: 1px solid var(--rule); }
+.pt-hd > div { padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; border-right: 1px solid var(--rule); }
+.pt-hd > div:last-child { border-right: none; }
+.pt-row { display: grid; grid-template-columns: 100px 1fr 160px; border-bottom: 1px solid var(--rule); }
+.pt-row:last-child { border-bottom: none; }
+.pt-row.hl { background: var(--blue); }
+.pt-row > div { padding: 13px 14px; font-size: 12px; border-right: 1px solid var(--rule); line-height: 1.5; }
+.pt-row.hl > div { border-right-color: rgba(255,255,255,0.1); }
+.pt-row:not(.hl) > div:last-child { border-right: none; }
+.pt-row.hl > div:last-child { border-right: none; }
+.pt-who { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600; }
+.pt-row:not(.hl) .pt-who { color: var(--blue); opacity: 0.6; }
+.pt-row.hl .pt-who { color: rgba(255,255,255,0.5); }
+.pt-action { color: var(--text); font-weight: 400; }
+.pt-row.hl .pt-action { color: rgba(255,255,255,0.85); }
+.pt-note { color: var(--t3); font-size: 11px; }
+.pt-row.hl .pt-note { color: rgba(255,255,255,0.4); }
+
+/* ── OUTCOMES mid-page ── */
+.out-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); margin-top: 32px; margin-bottom: 28px; }
+.og { padding: 28px; border-right: 1px solid var(--rule); }
+.og:last-child { border-right: none; }
+.og-n { font-family: 'NHG Display', 'SF Pro Display', -apple-system, 'Inter', sans-serif; font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.05em; color: var(--blue); margin-bottom: 8px; }
+.og-l { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.og-s { font-size: 11px; color: var(--t3); line-height: 1.5; }
+
+.q3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--rule); margin-bottom: 24px; }
+.q3-item { padding: 20px; border-right: 1px solid var(--rule); }
+.q3-item:last-child { border-right: none; }
+.qt { font-size: 12px; font-style: italic; color: var(--text); line-height: 1.6; margin-bottom: 8px; font-weight: 300; }
+.qa { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); letter-spacing: 0.04em; }
+
+.out-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); }
+.o2 { padding: 22px; border-right: 1px solid var(--rule); }
+.o2:last-child { border-right: none; }
+.o2-l { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; opacity: 0.5; }
+.o2-t { font-size: 12px; color: var(--t2); line-height: 1.65; }
+
+/* ── NARRATIVE ENDING ── */
+.narrative { max-width: 640px; }
+.narr-p { font-size: 15px; color: var(--t2); line-height: 1.8; margin-bottom: 20px; }
+.narr-p:last-child { margin-bottom: 0; }
+.narr-p strong { color: var(--text); font-weight: 600; }
+.narr-highlight { font-size: 16px; color: var(--text); font-weight: 400; line-height: 1.65; padding: 20px 0 20px 18px; border-left: 2px solid var(--blue); margin: 32px 0; }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--rule); padding: 28px 56px; display: flex; align-items: center; justify-content: space-between; }
+.ft { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); letter-spacing: 0.04em; }
+.ft-link { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 1px; transition: border-color 0.15s; }
+.ft-link:hover { border-color: var(--text); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.hero { animation: fadeUp 0.4s ease both; }
+
+@media (max-width: 720px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 48px 20px 0; }
+  .wrap { padding: 0 20px; }
+  footer { padding: 24px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .hero-top, .opening-split, .dial-item, .arch-wrap, .out-2col { grid-template-columns: 1fr; }
+  .hero-stats, .audit-row, .out-grid, .q3 { grid-template-columns: 1fr; }
+  .hs + .hs, .og + .og { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 20px; }
+  .pt-hd, .pt-row { grid-template-columns: 80px 1fr; }
+  .pt-hd > div:last-child, .pt-row > div:last-child { display: none; }
+  .dial-decision { border-right: none; border-bottom: 1px solid var(--rule); padding-right: 0; }
+  .dial-result { padding-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="index.html">Portfolio</a>
+  <span class="nav-mid">Update Sync · Figma Plugin</span>
+  <span class="nav-tag">Case Study</span>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-left">
+      <div class="eyebrow">Figma Plugin · Design Ops · Pet project</div>
+      <h1>Ship the update.<br><em>Find</em> every<br><span class="blue">old copy.</span></h1>
+      <p class="hero-sub">My team keeps design updates on a dedicated page as plain frames. After a change ships, outdated copies stay scattered across the file. Update Sync finds them and swaps in the exact new version — tagged with the release it shipped in.</p>
+      <div class="hero-meta">
+        <div class="hm-row"><span class="hm-k">Role</span><span class="hm-v">Designer &amp; builder</span></div>
+        <div class="hm-row"><span class="hm-k">Stack</span><span class="hm-v">Figma Plugin API · built with AI</span></div>
+        <div class="hm-row"><span class="hm-k">Scope</span><span class="hm-v">Idea → Internal testing</span></div>
+        <div class="hm-row"><span class="hm-k">Interface</span><span class="hm-v">RU / EN, switch in one click</span></div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-pipe-label">How the plugin works</div>
+      <div class="pipe-viz">
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Pick an update</div>
+            <div class="pv-note">From the team’s Updates page</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Scan the file</div>
+            <div class="pv-note">Find every outdated copy of that element</div>
+            <span class="pv-tag">★ Key step</span>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Review matches</div>
+            <div class="pv-note">See where each old version lives before changing anything</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Replace with an exact copy</div>
+            <div class="pv-note">The shipped version, not a redraw</div>
+          </div>
+        </div>
+        <div class="pv-step active">
+          <div class="pv-left"><div class="pv-dot"></div><div class="pv-line"></div></div>
+          <div class="pv-content">
+            <div class="pv-name">Tag with the release</div>
+            <div class="pv-note">Every change is traceable to the release it shipped in</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hs">
+      <div class="hs-n">0</div>
+      <div class="hs-l">redraws</div>
+      <div class="hs-s">replacement is an exact copy of the update</div>
+    </div>
+    <div class="hs">
+      <div class="hs-n">1</div>
+      <div class="hs-l">source of truth</div>
+      <div class="hs-s">the Updates page</div>
+    </div>
+    <div class="hs">
+      <div class="hs-n">2</div>
+      <div class="hs-l">languages</div>
+      <div class="hs-s">RU / EN interface</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-hd"><span class="sec-n">01</span><h2>The Problem</h2></div>
+  <div class="opening-split">
+    <div class="os-col bad">
+      <div class="os-lbl">Before</div>
+      <div class="os-time">Manual</div>
+      <div class="os-sub">hunting for old versions by eye</div>
+      <ul class="os-list">
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Updates live as plain frames, not components</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>No instance sync to rely on</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Old versions stay on other pages</li>
+        <li><span class="os-ic" style="color:#c04a4a;">✕</span>Nobody knows which release changed what</li>
+      </ul>
+    </div>
+    <div class="os-col good">
+      <div class="os-lbl">With Update Sync</div>
+      <div class="os-time">One pass</div>
+      <div class="os-sub">find, review, replace, tag</div>
+      <ul class="os-list">
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Old copies found automatically</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Exact copy of the shipped version</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Changes reviewed before replacing</li>
+        <li><span class="os-ic" style="color:rgba(255,255,255,0.7);">✓</span>Release tag on every update</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-line">
+    “Work with the file as the team really uses it — not as a perfect design system would want it.”
+    <div class="ql-attr">— Design principle for the plugin</div>
+  </div>
+  <div class="audit-row">
+    <div class="ar">
+      <div class="ar-n">Frames</div>
+      <div class="ar-l">Not components</div>
+      <div class="ar-d">Updates are plain frames, so Figma’s own component sync can’t help</div>
+    </div>
+    <div class="ar">
+      <div class="ar-n">Pages</div>
+      <div class="ar-l">Copies everywhere</div>
+      <div class="ar-d">Old versions sit in flows, specs and handoff pages across the file</div>
+    </div>
+    <div class="ar">
+      <div class="ar-n">Releases</div>
+      <div class="ar-l">No traceability</div>
+      <div class="ar-d">Hard to say which shipped release a screen reflects</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">02</span><h2>How It Thinks</h2></div>
+  <p>The plugin is built around three ideas: one page holds the truth, every update belongs to a release, and nothing is replaced without a review.</p>
+  <div class="arch-wrap">
+    <div class="arch-tiers">
+      <div class="arch-tier">
+        <div class="at-n">Updates page</div>
+        <div class="at-d">The team’s existing page of shipped updates becomes the source of truth.</div>
+        <span class="at-t">Source only</span>
+      </div>
+      <div class="arch-tier key">
+        <div class="at-n">Matching</div>
+        <div class="at-d">Finds outdated versions of each update across all pages of the file.</div>
+        <span class="at-t">★ Key layer</span>
+      </div>
+      <div class="arch-tier">
+        <div class="at-n">Release tags</div>
+        <div class="at-d">Each replacement is labelled with the release it shipped in.</div>
+        <span class="at-t">Traceability</span>
+      </div>
+    </div>
+    <div class="arch-code">
+      <div class="cp">
+        <div class="cp-l">update (example)</div>
+        <pre>{
+  <span class="ck">"frame"</span>: <span class="cv">"Note card"</span>,
+  <span class="ck">"release"</span>: <span class="cv">"v2.14"</span>
+}</pre>
+      </div>
+      <div class="cp hl">
+        <div class="cp-l">scan result (example)</div>
+        <pre><span class="cc">/* review before replacing */</span>
+<span class="ck">found</span>: <span class="cv">6 outdated copies</span>
+<span class="ck">pages</span>: <span class="cv">Flows · Specs · Handoff</span></pre>
+      </div>
+      <div class="cp">
+        <div class="cp-l">ui</div>
+        <pre><span class="ck">lang</span>: <span class="cv">RU | EN</span>  <span class="cc">/* one click */</span></pre>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">03</span><h2>Step by Step</h2></div>
+  <p>What happens when a designer runs the plugin after a release.</p>
+  <div class="pipe-table">
+    <div class="pt-hd">
+      <div>Who</div>
+      <div>What happens</div>
+      <div>Output</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Designer</div>
+      <div class="pt-action">Opens the plugin and picks an update from the Updates page</div>
+      <div class="pt-note">Selected update</div>
+    </div>
+    <div class="pt-row hl">
+      <div class="pt-who">Plugin</div>
+      <div class="pt-action">Scans every page for outdated copies of that element</div>
+      <div class="pt-note">List of matches</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Designer</div>
+      <div class="pt-action">Reviews the matches and chooses which to replace</div>
+      <div class="pt-note">Approved changes</div>
+    </div>
+    <div class="pt-row">
+      <div class="pt-who">Plugin</div>
+      <div class="pt-action">Replaces each copy with an exact duplicate of the update and tags the release</div>
+      <div class="pt-note">Up-to-date file</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">04</span><h2>Decisions &amp; Consequences</h2></div>
+  <p>Small tool, real tradeoffs.</p>
+
+  <div class="dialogue">
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 01</div>
+        <div class="dial-title">Support frames, not only components</div>
+        <div class="dial-body">Migrating the team to components would be the “clean” answer, but it isn’t how the team works today.</div>
+        <span class="dial-tag">Adoption · Reality</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">The plugin fits the existing workflow — nobody has to change how they file updates.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 02</div>
+        <div class="dial-title">Exact copy, never a redraw</div>
+        <div class="dial-body">Replacement duplicates the shipped frame instead of rebuilding it.</div>
+        <span class="dial-tag">Fidelity</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">What ships is pixel-identical everywhere it appears.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 03</div>
+        <div class="dial-title">Private first, Community later</div>
+        <div class="dial-body">I’m using it on real files before publishing.</div>
+        <span class="dial-tag">Validation</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">Edge cases surface on real work, not in a demo file.</div>
+      </div>
+    </div>
+    <div class="dial-item">
+      <div class="dial-decision">
+        <div class="dial-label">Decision 04</div>
+        <div class="dial-title">Two languages from day one</div>
+        <div class="dial-body">A click-to-switch RU / EN interface.</div>
+        <span class="dial-tag">Accessibility · Team</span>
+      </div>
+      <div class="dial-result">
+        <div class="dial-label">What happened</div>
+        <div class="dial-outcome-body">The whole team can use it in the language they think in.</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">05</span><h2>Status</h2></div>
+  <p>In internal testing on real team files.</p>
+  <div class="out-grid">
+    <div class="og">
+      <div class="og-n">RU/EN</div>
+      <div class="og-l">Interface</div>
+      <div class="og-s">switch in one click</div>
+    </div>
+    <div class="og">
+      <div class="og-n">Beta</div>
+      <div class="og-l">Internal use</div>
+      <div class="og-s">tested on real files before publishing</div>
+    </div>
+    <div class="og">
+      <div class="og-n">0</div>
+      <div class="og-l">Redraws</div>
+      <div class="og-s">exact copies only</div>
+    </div>
+  </div>
+  <div class="out-2col">
+    <div class="o2">
+      <div class="o2-l">What made this work</div>
+      <div class="o2-t">Starting from a real, repeated pain in my own team — not from a feature idea.</div>
+    </div>
+    <div class="o2">
+      <div class="o2-l">What's next</div>
+      <div class="o2-t">Publishing to Figma Community once it holds up on real files, and a log of updates per release.</div>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <div class="sec-hd"><span class="sec-n">06</span><h2>What I learned</h2></div>
+  <div class="narrative">
+    <p class="narr-p">Design ops problems are rarely about pixels. They are about keeping many copies of the truth in sync.</p>
+
+    <p class="narr-p"><strong>Tools should meet teams where they are.</strong> A plugin that requires a new workflow is one more thing to adopt; a plugin that fits the old one just gets used.</p>
+
+    <div class="narr-highlight">
+      The smallest tools often save the most time — because they remove a task people do every single release.
+    </div>
+
+    <p class="narr-p">Building it myself with an AI partner moved me from “I wish Figma did this” to a working tool in my own file.</p>
+
+  </div>
+
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span class="ft">Anna Izotova · Product Designer · 2026</span>
+  <a class="ft-link" href="index.html">← Back to portfolio</a>
+</footer>
+
+</body>
+</html>
